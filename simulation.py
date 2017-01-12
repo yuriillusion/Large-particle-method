@@ -1,14 +1,12 @@
+import visualization
 from math import *
 import copy
-import matplotlib.pyplot as plt
-import matplotlib.animation as animation
 
 N = 120
 M = 1
 r = 15e+4
 dt = 0.0002
 boundary = 300
-T=10
 initial_speed = (1000, 1000)
 
 
@@ -81,7 +79,6 @@ def calculate_distance(point1, point2):
 
 def simulate_frame(x, v, a, s):
     x = calculate_coordinates(x, v, a)
-    print x[::10]
     F, s = calculate_force(x, s)
     a = calculate_acceleration(F)
     v = calculate_speed(x, v, a)
@@ -94,38 +91,11 @@ def simulate(number_of_frames):
     for i in xrange(number_of_frames):
         x, v, a, s = simulate_frame(x, v, a, s)
         X.append(copy.deepcopy(x))
+        print 'Time frame number:', i
     return X
 
 
-def make_animation(X):
-    fig = plt.figure()
-    ax = fig.add_subplot(111, aspect='equal', autoscale_on=False,
-                     xlim=(0, 500), ylim=(100, boundary*1.1))
-    plt.plot([0, 500], [boundary, boundary], 'k-')
-    particles, = ax.plot([], [], 'bo', ms=5)
-
-    def init():
-        particles.set_data([], [])
-        return particles,
-
-    def animate(i):
-        ms = 5
-        x = [X[i][j][0] for j in xrange(N)]
-        y = [X[i][j][1] for j in xrange(N)]
-        particles.set_data(x, y)
-        particles.set_markersize(ms)
-        return particles,
-
-    ani = animation.FuncAnimation(fig, animate, frames=T,
-                              interval=1, blit=True, init_func=init)
-
-    #Writer = animation.writers[u'imagemagick']
-    #writer = Writer(fps=15, metadata=dict(artist='Me'), bitrate=1800)
-    #ani.save('mymovie.mp4',writer=writer)
-    #ani.save('ani.gif', writer='imagemagick'.encode('ascii'), fps=30)
-    plt.show()
-
-
 if __name__ == '__main__':
-    X = simulate(T)
-    make_animation(X)
+    time_frames = 500
+    X = simulate(time_frames)
+    visualization.make_animation(X, time_frames, (0, 500), (100, boundary*1.1), 1, boundary)
